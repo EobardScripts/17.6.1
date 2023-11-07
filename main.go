@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -17,8 +16,8 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	c1 := make(chan int)
 	c2 := make(chan int)
-	countOfc1 := 0
-	countOfc2 := 0
+	countOfc1 := 0.
+	countOfc2 := 0.
 	var wg sync.WaitGroup
 	//Отправитель сообщений
 	sender := func() {
@@ -48,12 +47,18 @@ func main() {
 			case num := <-c1:
 				{
 					countOfc1++
-					fmt.Println("Канал с1 принял "+strconv.Itoa(countOfc1)+" сообщений, сообщение из канала: ", num)
+					//Вычисляем процентное соотношение полученных сообщений канала с1 по отношению к каналу с2
+					var ration = (countOfc1 / (countOfc1 + countOfc2)) * 100
+					str := fmt.Sprintf("Канал с1 принимает %.2f%% сообщений, сообщение из канала: %d", ration, num)
+					fmt.Println(str)
 				}
 			case num := <-c2:
 				{
 					countOfc2++
-					fmt.Println("Канал с2 принял "+strconv.Itoa(countOfc1)+" сообщений, сообщение из канала: ", num)
+					//Вычисляем процентное соотношение полученных сообщений канала с2 по отношению к каналу с1
+					var ration = (countOfc2 / (countOfc1 + countOfc2)) * 100
+					str := fmt.Sprintf("Канал с2 принимает %.2f%% сообщений, сообщение из канала: %d", ration, num)
+					fmt.Println(str)
 				}
 			default:
 				fmt.Println("Сообщений не поступило")
